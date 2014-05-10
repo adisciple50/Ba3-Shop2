@@ -56,3 +56,12 @@ class Department(datdb.Model):
         dbiface.QuerySet(self.department).bulk_create(Item.getUniqueDepartments())
         self.update()
 
+class settings(datdb.Model):
+    name = datdb.CharField(max_length=320,primary_key=True)
+    property = datdb.CharField(max_length=320,null=True)
+    type = datdb.CharField(max_length=320,null=True)
+
+    def getEbaySettingsDict(self):
+        rawSettings = dbiface.QuerySet(self,type_exact="ebay").exclude(type_regex='.*')
+        ebaySettingsDict = rawSettings.get()
+        return ebaySettingsDict
