@@ -39,21 +39,20 @@ class User(datdb.Model):
 class Department(datdb.Model):
     iid = datdb.AutoField()
     department = datdb.CharField(max_length=60,primary_key=True)
-    ReductionByPercent = datdb.DecimalField()
-    ReductionByCash = datdb.DecimalField()
-    RiseByPercent = datdb.DecimalField()
-    RiseByCash = datdb.DecimalField()
-    ReducePrice = datdb.NullBooleanField()
-    IncreasePrice = datdb.NullBooleanField()
-    ApplyTax = datdb.BooleanField()
-    Tax = datdb.DecimalField()
+    ReductionByPercent = datdb.DecimalField(default=0)
+    ReductionByCash = datdb.DecimalField(default=0)
+    RiseByPercent = datdb.DecimalField(defualt=0)
+    RiseByCash = datdb.DecimalField(defualt=0)
+    PriceChangeChoices = ["None","RiseByCash","RiseByPercent","ReduceByCash","ReduceByPercent"]
+    PriceChange = datdb.CharField(max_length=10,choices=PriceChangeChoices,default='None')
+    ApplyTax = datdb.BooleanField(default=True)
+    TaxPercent = datdb.DecimalField(default=20)
+
     def listDepartments(self):
-        return self.department.column()
+        return dbiface.QuerySet(self.department).order_by(self.department)
 
     def update(self):
-        dataDelete = dbiface.QuerySet(self.department).delete()
+        dbiface.QuerySet(self).delete()
         dbiface.QuerySet(self.department).bulk_create(Item.getUniqueDepartments())
         self.update()
-
-
 
