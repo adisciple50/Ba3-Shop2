@@ -3,6 +3,7 @@ __author__ = 'Jason Crockett'
 import django.db.models as datdb
 import django.db.models.manager as dbiface
 import django.forms.formsets as dbiform
+import ebay
 
 class Item(datdb.Model):
     iid = datdb.AutoField(primary_key=True)
@@ -27,6 +28,11 @@ class Item(datdb.Model):
     def returnItemsByQuery(self):
         requestedItem = dbiform.Form(self.name)
         return dbiface.QuerySet(Item,Item_name_contains=requestedItem)
+
+    def populateItems(self):
+        dbiface.QuerySet(self).delete()
+        dbiface.QuerySet(self.name).bulk_create(Item.getUniqueDepartments())
+        self.update()
 
 class User(datdb.Model):
     iid = datdb.AutoField()
@@ -56,9 +62,9 @@ class Department(datdb.Model):
         dbiface.QuerySet(self.department).bulk_create(Item.getUniqueDepartments())
         self.update()
 
-class settings(datdb.Model):
+class Settings(datdb.Model):
     name = datdb.CharField(max_length=320,primary_key=True)
-    property = datdb.CharField(max_length=320,null=True)
+    property = datdb.CharField(max_length=1024,null=True)
     type = datdb.CharField(max_length=320,null=True)
 
     def getEbaySettingsDict(self):
